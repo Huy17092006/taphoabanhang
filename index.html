@@ -709,36 +709,40 @@ async function startApp(){
   overlay.classList.add('hidden');
   statusEl.textContent='⏳ Đang tải mô hình vũ trụ...';
 
-  const handsDetector=new Hands({
-    locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
-  });
-  handsDetector.setOptions({
-    maxNumHands:1, modelComplexity:1,
-    minDetectionConfidence:0.72, minTrackingConfidence:0.62
-  });
-
-  handsDetector.onResults(res=>{
-    if(res.multiHandLandmarks?.length){
-      curLm=res.multiHandLandmarks[0];
-      handSeen=true; lastHandTs=Date.now();
-      const o=getOpenness(curLm);
-      statusEl.textContent = o>0.65
-        ? '🌌 Vũ trụ bùng nổ — Ảnh nở ra ✨'
-        : o<0.28
-          ? '⭐ Ngôi sao hội tụ — Hành tinh ra đời 🪐'
-          : '🤚 Đang nhận diện cử chỉ...';
-    } else {
-      if(Date.now()-lastHandTs>900){ handSeen=false; curLm=null; }
-      statusEl.textContent='👋 Đưa tay vào vũ trụ';
-    }
-  });
-
-  const camera=new Camera(video,{
-    onFrame:async()=>{ await handsDetector.send({image:video}); },
-    width:1280,height:720
-  });
-
   try{
+    if(typeof Hands==='undefined'||typeof Camera==='undefined'){
+      throw new Error('Không thể tải thư viện MediaPipe — kiểm tra kết nối mạng và tải lại trang.');
+    }
+
+    const handsDetector=new Hands({
+      locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+    });
+    handsDetector.setOptions({
+      maxNumHands:1, modelComplexity:1,
+      minDetectionConfidence:0.72, minTrackingConfidence:0.62
+    });
+
+    handsDetector.onResults(res=>{
+      if(res.multiHandLandmarks?.length){
+        curLm=res.multiHandLandmarks[0];
+        handSeen=true; lastHandTs=Date.now();
+        const o=getOpenness(curLm);
+        statusEl.textContent = o>0.65
+          ? '🌌 Vũ trụ bùng nổ — Ảnh nở ra ✨'
+          : o<0.28
+            ? '⭐ Ngôi sao hội tụ — Hành tinh ra đời 🪐'
+            : '🤚 Đang nhận diện cử chỉ...';
+      } else {
+        if(Date.now()-lastHandTs>900){ handSeen=false; curLm=null; }
+        statusEl.textContent='👋 Đưa tay vào vũ trụ';
+      }
+    });
+
+    const camera=new Camera(video,{
+      onFrame:async()=>{ await handsDetector.send({image:video}); },
+      width:1280,height:720
+    });
+
     await camera.start();
     statusEl.textContent='👋 Đưa tay vào vũ trụ';
     const iv=setInterval(()=>{
@@ -749,7 +753,7 @@ async function startApp(){
       }
     },200);
   }catch(e){
-    statusEl.textContent='❌ Lỗi camera: '+e.message;
+    statusEl.textContent='❌ Lỗi: '+(e.message||e);
     overlay.classList.remove('hidden');
   }
 }
