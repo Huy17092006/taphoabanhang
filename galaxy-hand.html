@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dải Ngân Hà - Tương Tác Bằng Tay</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+
+    #video {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      opacity: 0.35;
+      z-index: 0;
+    }
+
+    #canvas {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+    }
+
+    #ui {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 10; text-align: center; color: #fff;
+      text-shadow: 0 0 12px #88f;
+    }
+    #ui h1 { font-size: 1.4rem; letter-spacing: 3px; color: #c8aaff; margin-bottom: 6px; }
+    #ui p  { font-size: 0.8rem; opacity: 0.7; }
+
+    #status {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 10; font-size: 0.85rem; color: #aaf; background: rgba(0,0,20,0.6);
+      padding: 6px 18px; border-radius: 20px; border: 1px solid #446;
+    }
+
+    #start-btn {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      z-index: 20; background: linear-gradient(135deg,#2a0060,#000033);
+      color: #c8aaff; border: 2px solid #6633cc; padding: 18px 40px;
+      border-radius: 40px; font-size: 1.1rem; cursor: pointer;
+      letter-spacing: 2px; box-shadow: 0 0 30px #6633cc88;
+      transition: all 0.3s;
+    }
+    #start-btn:hover { box-shadow: 0 0 50px #aa66ff; transform: translate(-50%,-50%) scale(1.05); }
+    #start-btn.hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<video id="video" autoplay playsinline muted></video>
+<canvas id="canvas"></canvas>
+
+<div id="status">Nhấn nút để bắt đầu</div>
+
+<button id="start-btn">✨ Khám Phá Dải Ngân Hà</button>
+
+<div id="ui">
+  <h1>🌌 GALAXY HAND</h1>
+  <p>Di chuyển tay để tạo hiệu ứng dải ngân hà • Chụm ngón tay để tạo vụ nổ sao</p>
+</div>
+
+<!-- MediaPipe Hands -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+<script>
+const canvas  = document.getElementById('canvas');
+const ctx     = canvas.getContext('2d');
+const video   = document.getElementById('video');
+const statusEl= document.getElementById('status');
+const startBtn= document.getElementById('start-btn');
+
+let W, H;
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ── Particles ─────────────────────────────────────────────────────────────
+const STARS = 1800;
+const particles = [];
+const trails    = [];
+
+function randRange(a, b) { return a + Math.random() * (b - a); }
+function hsl(h,s,l) { return `hsl(${h},${s}%,${l}%)`; }
+
+class Star {
+  constructor(x, y, fast) {
+    this.reset(x, y, fast);
+  }
+  reset(x, y, fast) {
+    this.x  = x  ?? randRange(0, W);
+    this.y  = y  ?? randRange(0, H);
+    this.r  = randRange(0.5, 2.5);
+    this.hue= randRange(200, 280);
+    this.alpha = randRange(0.3, 1);
+    this.vx = randRange(-0.15, 0.15);
+    this.vy = randRange(-0.08, 0.08);
+    this.life = randRange(80, 200);
+    this.maxLife = this.life;
+    this.fast = fast;
+    if (fast) {
+      this.vx *= 6; this.vy *= 6;
+      this.r   = randRange(1.5, 4);
+      this.hue = randRange(30, 80);
+    }
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life--;
+    this.alpha = (this.life / this.maxLife) * (this.fast ? 1 : 0.9);
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+    ctx.fillStyle = `hsla(${this.hue},90%,80%,${this.alpha})`;
+    ctx.shadowColor= `hsl(${this.hue},100%,70%)`;
+    ctx.shadowBlur = this.fast ? 18 : 8;
+    ctx.fill();
+  }
+}
+
+// init background stars
+for (let i = 0; i < STARS; i++) particles.push(new Star());
+
+// ── Galaxy spiral arms ────────────────────────────────────────────────────
+class GalaxyParticle {
+  constructor(cx, cy, arm) {
+    const t     = randRange(0.3, 2.5);
+    const angle = t * 2.5 + arm * (Math.PI*2/3);
+    const spread= randRange(-30, 30);
+    this.x  = cx + Math.cos(angle) * t * 90 + Math.cos(angle+Math.PI/2)*spread;
+    this.y  = cy + Math.sin(angle) * t * 90 + Math.sin(angle+Math.PI/2)*spread;
+    this.r  = randRange(0.8, 3);
+    this.hue= randRange(200, 300);
+    this.life = randRange(60, 140);
+    this.maxLife = this.life;
+    this.vx = (this.x - cx) * 0.006;
+    this.vy = (this.y - cy) * 0.006;
+  }
+  update() { this.x += this.vx; this.y += this.vy; this.life--; }
+  get alpha() { return this.life / this.maxLife; }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+    ctx.fillStyle = `hsla(${this.hue},100%,80%,${this.alpha})`;
+    ctx.shadowColor= `hsl(${this.hue},100%,70%)`;
+    ctx.shadowBlur = 12;
+    ctx.fill();
+  }
+}
+
+const galaxyPool = [];
+function spawnGalaxy(cx, cy) {
+  for (let arm = 0; arm < 3; arm++)
+    for (let i = 0; i < 25; i++)
+      galaxyPool.push(new GalaxyParticle(cx, cy, arm));
+}
+
+// ── Hand data ─────────────────────────────────────────────────────────────
+let hands = [];      // array of {landmarks}
+let pinchActive = [];// per hand
+
+function dist2D(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// ── Render loop ───────────────────────────────────────────────────────────
+function draw() {
+  ctx.fillStyle = 'rgba(0,0,10,0.18)';
+  ctx.fillRect(0, 0, W, H);
+
+  // background starfield
+  for (const p of particles) {
+    p.update();
+    p.draw();
+    if (p.life <= 0) p.reset();
+  }
+
+  // galaxy particles
+  for (let i = galaxyPool.length - 1; i >= 0; i--) {
+    galaxyPool[i].update();
+    galaxyPool[i].draw();
+    if (galaxyPool[i].life <= 0) galaxyPool.splice(i, 1);
+  }
+
+  // hand effects
+  for (let hi = 0; hi < hands.length; hi++) {
+    const lm = hands[hi];
+    if (!lm) continue;
+
+    // mirror x because video is flipped
+    const mx = lm => (1 - lm.x) * W;
+    const my = lm => lm.y * H;
+
+    const wrist = { x: mx(lm[0]), y: my(lm[0]) };
+    const indexTip = { x: mx(lm[8]),  y: my(lm[8])  };
+    const thumbTip = { x: mx(lm[4]),  y: my(lm[4])  };
+    const middleTip= { x: mx(lm[12]), y: my(lm[12]) };
+    const pinkyTip = { x: mx(lm[20]), y: my(lm[20]) };
+
+    // pinch detection (thumb ↔ index)
+    const pinchDist = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y);
+    const pinching  = pinchDist < 40;
+
+    if (pinching && !pinchActive[hi]) {
+      // Big bang on pinch
+      const cx = (thumbTip.x + indexTip.x) / 2;
+      const cy = (thumbTip.y + indexTip.y) / 2;
+      spawnGalaxy(cx, cy);
+      // Explosion burst
+      for (let i = 0; i < 60; i++) {
+        const s = new Star(cx, cy, true);
+        particles.push(s);
+      }
+    }
+    pinchActive[hi] = pinching;
+
+    // Nebula trail at index finger
+    if (!pinching) {
+      for (let i = 0; i < 5; i++) {
+        const s = new Star(
+          indexTip.x + randRange(-10,10),
+          indexTip.y + randRange(-10,10)
+        );
+        s.life = randRange(30, 70);
+        s.maxLife = s.life;
+        s.r = randRange(1, 4);
+        s.hue = randRange(180,280);
+        particles.push(s);
+      }
+    }
+
+    // Draw skeleton
+    const connections = [
+      [0,1],[1,2],[2,3],[3,4],
+      [0,5],[5,6],[6,7],[7,8],
+      [0,9],[9,10],[10,11],[11,12],
+      [0,13],[13,14],[14,15],[15,16],
+      [0,17],[17,18],[18,19],[19,20],
+      [5,9],[9,13],[13,17]
+    ];
+
+    ctx.strokeStyle = `hsla(${260+hi*60},100%,75%,0.55)`;
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = `hsl(${260+hi*60},100%,75%)`;
+    ctx.shadowBlur  = 10;
+    for (const [a,b] of connections) {
+      ctx.beginPath();
+      ctx.moveTo(mx(lm[a]), my(lm[a]));
+      ctx.lineTo(mx(lm[b]), my(lm[b]));
+      ctx.stroke();
+    }
+
+    // landmark dots
+    for (let i = 0; i < lm.length; i++) {
+      const x = mx(lm[i]), y = my(lm[i]);
+      ctx.beginPath();
+      ctx.arc(x, y, i===0?5:3, 0, Math.PI*2);
+      ctx.fillStyle = i===4||i===8
+        ? (pinching ? '#ff0' : '#fff')
+        : `hsla(${220+i*4},100%,80%,0.9)`;
+      ctx.shadowBlur = 15;
+      ctx.fill();
+    }
+
+    // Pinch indicator
+    if (pinching) {
+      const cx = (thumbTip.x + indexTip.x)/2;
+      const cy = (thumbTip.y + indexTip.y)/2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 20, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,220,0,0.8)';
+      ctx.lineWidth = 2;
+      ctx.shadowColor= '#ffdd00';
+      ctx.shadowBlur = 30;
+      ctx.stroke();
+    }
+
+    ctx.shadowBlur = 0;
+  }
+
+  // ambient nebula clouds (random drift)
+  if (Math.random() < 0.08) {
+    const s = new Star();
+    s.r = randRange(3, 7);
+    s.hue = randRange(200,320);
+    s.alpha = 0.08;
+    s.life = 200; s.maxLife = 200;
+    particles.push(s);
+  }
+
+  // trim excess particles
+  if (particles.length > STARS + 2000) particles.splice(0, particles.length - STARS - 2000);
+
+  requestAnimationFrame(draw);
+}
+
+// ── MediaPipe setup ───────────────────────────────────────────────────────
+async function startCamera() {
+  startBtn.classList.add('hidden');
+  statusEl.textContent = 'Đang khởi động camera...';
+
+  const handsDetector = new Hands({
+    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+  });
+
+  handsDetector.setOptions({
+    maxNumHands: 2,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.7,
+    minTrackingConfidence: 0.6
+  });
+
+  handsDetector.onResults(results => {
+    hands = [];
+    pinchActive = [];
+    if (results.multiHandLandmarks) {
+      for (const lm of results.multiHandLandmarks) {
+        hands.push(lm);
+        pinchActive.push(false);
+      }
+    }
+    statusEl.textContent = hands.length > 0
+      ? `✋ Phát hiện ${hands.length} bàn tay — Di chuyển để tạo dải ngân hà`
+      : '🌌 Đưa tay vào khung hình';
+  });
+
+  const camera = new Camera(video, {
+    onFrame: async () => { await handsDetector.send({ image: video }); },
+    width: 1280, height: 720
+  });
+
+  try {
+    await camera.start();
+    statusEl.textContent = '🌌 Đưa tay vào khung hình';
+  } catch(e) {
+    statusEl.textContent = '❌ Không truy cập được camera: ' + e.message;
+  }
+}
+
+startBtn.addEventListener('click', startCamera);
+draw();
+</script>
+</body>
+</html>
