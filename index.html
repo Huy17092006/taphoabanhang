@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>✨ Vũ Trụ Magic Hand</title>
+  <title>🌌 Vũ Trụ Magic Hand</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; user-select: none; }
@@ -26,22 +26,22 @@
     #status {
       position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
       z-index: 10;
-      background: rgba(2, 0, 18, 0.85);
+      background: rgba(2, 0, 18, 0.88);
       color: #99ccff;
       padding: 8px 28px;
       border-radius: 28px;
-      border: 1px solid rgba(60, 120, 220, 0.4);
+      border: 1px solid rgba(60, 120, 220, 0.45);
       font-size: 0.82rem;
       backdrop-filter: blur(16px);
       white-space: nowrap;
-      letter-spacing: 0.6px;
-      text-shadow: 0 0 12px #4488ff88;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px #4488ff66;
     }
 
     #hint {
-      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
       z-index: 10;
-      background: rgba(2, 0, 18, 0.78);
+      background: rgba(2, 0, 18, 0.8);
       color: rgba(160, 200, 255, 0.75);
       padding: 10px 34px;
       border-radius: 32px;
@@ -53,93 +53,70 @@
       pointer-events: none;
     }
 
-    /* ── Overlay ── */
+    /* ── Overlay ─────────────────────────────── */
     #overlay {
       position: fixed; inset: 0; z-index: 20;
       background:
-        radial-gradient(ellipse at 30% 40%, rgba(30,10,80,0.9) 0%, transparent 60%),
-        radial-gradient(ellipse at 70% 60%, rgba(10,30,80,0.8) 0%, transparent 55%),
-        radial-gradient(ellipse at 50% 100%, rgba(60,0,30,0.5) 0%, transparent 50%),
+        radial-gradient(ellipse at 30% 40%, rgba(28,8,75,0.95) 0%, transparent 60%),
+        radial-gradient(ellipse at 75% 65%, rgba(8,28,80,0.9)  0%, transparent 55%),
+        radial-gradient(ellipse at 50% 95%, rgba(55,0,28,0.55) 0%, transparent 50%),
         #000;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 28px;
-      overflow: hidden;
+      gap: 28px; overflow: hidden;
     }
 
-    #overlay canvas#bg-canvas {
-      position: absolute; inset: 0; z-index: 0;
-    }
+    #bg-canvas { position: absolute; inset: 0; z-index: 0; }
 
-    #overlay .content {
+    .ov-content {
       display: flex; flex-direction: column;
-      align-items: center; gap: 26px;
-      z-index: 1;
+      align-items: center; gap: 26px; z-index: 1;
     }
 
-    #overlay .title {
+    .ov-title {
       font-size: 2.8rem;
-      background: linear-gradient(135deg, #88ccff, #cc88ff, #ffaa66, #88ccff);
+      background: linear-gradient(135deg, #88ccff, #cc88ff, #ffaa55, #88ccff);
       background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: 6px;
-      text-align: center;
+      letter-spacing: 7px; text-align: center;
       animation: shimmer 4s linear infinite;
-      filter: drop-shadow(0 0 30px rgba(100,160,255,0.5));
+      filter: drop-shadow(0 0 28px rgba(100,160,255,.5));
+    }
+    @keyframes shimmer { to { background-position: 300% 50%; } }
+
+    .ov-sub {
+      color: rgba(160,200,255,.6);
+      font-size: .88rem; text-align: center;
+      max-width: 360px; line-height: 1.9;
     }
 
-    @keyframes shimmer {
-      0%   { background-position: 0% 50%; }
-      100% { background-position: 300% 50%; }
-    }
-
-    #overlay .subtitle {
-      color: rgba(160,200,255,0.6);
-      font-size: 0.88rem;
-      text-align: center;
-      max-width: 360px;
-      line-height: 1.9;
-    }
-
-    .gesture-row {
-      display: flex; gap: 28px;
-    }
-
-    .gesture-card {
-      background: rgba(10, 20, 60, 0.65);
-      border: 1px solid rgba(60,120,220,0.35);
-      border-radius: 18px;
-      padding: 18px 26px;
-      text-align: center;
-      color: rgba(180,210,255,0.8);
-      font-size: 0.8rem;
-      line-height: 1.9;
+    .gest-row { display: flex; gap: 28px; }
+    .gest-card {
+      background: rgba(10,20,60,.65);
+      border: 1px solid rgba(60,120,220,.35);
+      border-radius: 18px; padding: 18px 26px;
+      text-align: center; color: rgba(180,210,255,.8);
+      font-size: .8rem; line-height: 1.9;
       backdrop-filter: blur(8px);
     }
-
-    .gesture-card .ico { font-size: 2.2rem; display: block; margin-bottom: 4px; }
+    .gest-card .ico { font-size: 2.2rem; display: block; margin-bottom: 4px; }
 
     #start-btn {
-      background: linear-gradient(135deg, rgba(20,60,160,0.8) 0%, rgba(5,10,40,0.9) 100%);
+      background: linear-gradient(135deg, rgba(20,60,160,.8) 0%, rgba(5,10,40,.9) 100%);
       color: #aaccff;
-      border: 1.5px solid rgba(80,140,255,0.6);
-      padding: 16px 58px;
-      border-radius: 50px;
-      font-size: 1.05rem;
-      cursor: pointer;
+      border: 1.5px solid rgba(80,140,255,.6);
+      padding: 16px 58px; border-radius: 50px;
+      font-size: 1.05rem; cursor: pointer;
       letter-spacing: 3px;
-      box-shadow: 0 0 40px rgba(60,100,255,0.3), 0 0 80px rgba(20,60,200,0.15);
-      transition: all 0.3s;
+      box-shadow: 0 0 40px rgba(60,100,255,.3), 0 0 80px rgba(20,60,200,.15);
+      transition: all .3s;
     }
-
     #start-btn:hover {
-      box-shadow: 0 0 70px rgba(80,150,255,0.7), 0 0 140px rgba(40,100,255,0.3);
-      transform: scale(1.06);
-      border-color: #88bbff;
-      color: #fff;
+      box-shadow: 0 0 70px rgba(80,150,255,.75), 0 0 140px rgba(40,100,255,.35);
+      transform: scale(1.06); border-color: #88bbff; color: #fff;
     }
+    #start-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
     .hidden { display: none !important; }
   </style>
@@ -148,108 +125,84 @@
 
 <video id="video" autoplay playsinline muted></video>
 <canvas id="canvas"></canvas>
-
 <div id="status">Nhấn nút để bắt đầu hành trình vũ trụ</div>
 <div id="hint">
-  ✊ <strong>Chụm tay</strong> → Ngôi sao hội tụ
+  ✊ <strong>Chụm 5 ngón tay</strong> → Ngôi sao hội tụ
   &nbsp;·&nbsp;
-  🖐 <strong>Bung tay</strong> → Vũ trụ nở ra · Ảnh hiện lên
+  🖐 <strong>Bung 5 ngón tay</strong> → Vũ trụ nở ra, ảnh hiện lên
 </div>
 
 <div id="overlay">
   <canvas id="bg-canvas"></canvas>
-  <div class="content">
-    <div class="title">🌌 VŨ TRỤ 🌌</div>
-    <div class="subtitle">Điều khiển vũ trụ bằng bàn tay của bạn<br>Trải nghiệm kỳ diệu đang chờ phía trước</div>
-    <div class="gesture-row">
-      <div class="gesture-card">
-        <span class="ico">✊</span>
-        Chụm 5 ngón tay<br><span style="color:#88aaff">→ Ngôi sao ra đời</span>
-      </div>
-      <div class="gesture-card">
-        <span class="ico">🖐</span>
-        Bung 5 ngón tay<br><span style="color:#ffcc66">→ Vũ trụ bùng nổ</span>
-      </div>
+  <div class="ov-content">
+    <div class="ov-title">🌌 VŨ TRỤ 🌌</div>
+    <div class="ov-sub">Điều khiển vũ trụ bằng bàn tay của bạn<br>Trải nghiệm kỳ diệu đang chờ phía trước</div>
+    <div class="gest-row">
+      <div class="gest-card"><span class="ico">✊</span>Chụm 5 ngón tay<br><span style="color:#88aaff">→ Ngôi sao ra đời</span></div>
+      <div class="gest-card"><span class="ico">🖐</span>Bung 5 ngón tay<br><span style="color:#ffcc55">→ Vũ trụ bùng nổ</span></div>
     </div>
     <button id="start-btn">🚀 Khám Phá Vũ Trụ</button>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<!-- MediaPipe Tasks Vision (newer, reliable, no COOP/COEP needed) -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.js"></script>
 
 <script>
-// ──────────────────────────────────────────────────────────────────────────────
-// OVERLAY BACKGROUND — animated galaxy
-// ──────────────────────────────────────────────────────────────────────────────
-(function() {
+'use strict';
+// ── Overlay starfield ────────────────────────────────────────────────────────
+(function () {
   const bc = document.getElementById('bg-canvas');
   const bx = bc.getContext('2d');
-  bc.width  = window.innerWidth;
-  bc.height = window.innerHeight;
-  window.addEventListener('resize', () => { bc.width=window.innerWidth; bc.height=window.innerHeight; });
+  function setSize() { bc.width = innerWidth; bc.height = innerHeight; }
+  setSize(); window.addEventListener('resize', setSize);
 
-  const stars = Array.from({length:300}, () => ({
-    x: Math.random()*bc.width,  y: Math.random()*bc.height,
-    r: Math.random()*1.8+0.2,
-    h: 180+Math.random()*80, a: Math.random()*0.7+0.2,
-    sp: Math.random()*0.3+0.05,
-    ph: Math.random()*Math.PI*2
+  const stars = Array.from({ length: 280 }, () => ({
+    x: Math.random(), y: Math.random(),
+    r: Math.random() * 1.8 + 0.3,
+    h: 180 + Math.random() * 80,
+    a: Math.random() * 0.6 + 0.2,
+    sp: Math.random() * 0.25 + 0.05,
+    ph: Math.random() * Math.PI * 2
   }));
 
-  let bgT = 0;
+  let t = 0;
   (function bgLoop() {
-    bgT += 0.01;
-    bx.clearRect(0,0,bc.width,bc.height);
+    t += 0.01;
+    bx.clearRect(0, 0, bc.width, bc.height);
 
-    // Nebula clouds
-    const clouds = [
-      {cx:.28,cy:.38,rx:350,ry:220,h:250,a:.08},
-      {cx:.72,cy:.6, rx:300,ry:200,h:200,a:.07},
-      {cx:.5, cy:.8, rx:250,ry:150,h:350,a:.06},
-    ];
-    for (const cl of clouds) {
-      const gr = bx.createRadialGradient(
-        cl.cx*bc.width, cl.cy*bc.height, 0,
-        cl.cx*bc.width, cl.cy*bc.height, cl.rx
-      );
-      gr.addColorStop(0, `hsla(${cl.h},80%,50%,${cl.a})`);
-      gr.addColorStop(1, 'transparent');
-      bx.save();
-      bx.scale(1, cl.ry/cl.rx);
+    // Nebula blobs
+    [[.28,.38,340,210,250,.08],[.74,.6,290,190,200,.07],[.5,.85,240,145,345,.06]].forEach(([cx,cy,rx,ry,h,a]) => {
+      const gr = bx.createRadialGradient(cx*bc.width, cy*bc.height, 0, cx*bc.width, cy*bc.height, rx);
+      gr.addColorStop(0, `hsla(${h},80%,50%,${a})`); gr.addColorStop(1, 'transparent');
+      bx.save(); bx.scale(1, ry/rx);
       bx.beginPath();
-      bx.arc(cl.cx*bc.width, cl.cy*bc.height*(cl.rx/cl.ry), cl.rx, 0, Math.PI*2);
-      bx.fillStyle = gr;
-      bx.fill();
+      bx.arc(cx*bc.width, cy*bc.height*(rx/ry), rx, 0, Math.PI*2);
+      bx.fillStyle = gr; bx.fill();
       bx.restore();
-    }
+    });
 
-    // Stars with twinkle
+    // Twinkling stars — always positive radius
     for (const s of stars) {
-      const twinkle = 0.4 + Math.sin(bgT*s.sp + s.ph)*0.6;
+      const tw = 0.2 + Math.abs(Math.sin(t * s.sp + s.ph)) * 0.8;
       bx.beginPath();
-      bx.arc(s.x, s.y, s.r*twinkle, 0, Math.PI*2);
-      bx.fillStyle = `hsla(${s.h},60%,90%,${s.a*twinkle})`;
+      bx.arc(s.x * bc.width, s.y * bc.height, Math.max(0.1, s.r * tw), 0, Math.PI * 2);
+      bx.fillStyle = `hsla(${s.h},60%,90%,${s.a * tw})`;
       bx.fill();
     }
 
-    // Milky way band
+    // Milky-way shimmer
     const mw = bx.createLinearGradient(0, bc.height*.2, bc.width, bc.height*.8);
-    mw.addColorStop(0,   'transparent');
-    mw.addColorStop(0.3, 'rgba(120,100,200,0.04)');
-    mw.addColorStop(0.5, 'rgba(160,140,255,0.07)');
-    mw.addColorStop(0.7, 'rgba(100,120,200,0.04)');
-    mw.addColorStop(1,   'transparent');
-    bx.fillStyle = mw;
-    bx.fillRect(0, 0, bc.width, bc.height);
+    mw.addColorStop(0,'transparent'); mw.addColorStop(.35,'rgba(120,100,200,.04)');
+    mw.addColorStop(.5,'rgba(160,140,255,.07)'); mw.addColorStop(.65,'rgba(100,120,200,.04)');
+    mw.addColorStop(1,'transparent');
+    bx.fillStyle = mw; bx.fillRect(0,0,bc.width,bc.height);
 
     requestAnimationFrame(bgLoop);
-  })();
-})();
+  }());
+}());
 
-// ──────────────────────────────────────────────────────────────────────────────
-// MAIN APP
-// ──────────────────────────────────────────────────────────────────────────────
+// ── Canvas setup ─────────────────────────────────────────────────────────────
 const canvas  = document.getElementById('canvas');
 const ctx     = canvas.getContext('2d');
 const video   = document.getElementById('video');
@@ -258,31 +211,27 @@ const startBtn= document.getElementById('start-btn');
 const overlay = document.getElementById('overlay');
 
 let W, H;
-const resize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
-resize();
-window.addEventListener('resize', resize);
+const resize = () => { W = canvas.width = innerWidth; H = canvas.height = innerHeight; };
+resize(); window.addEventListener('resize', resize);
 
-// ── roundRect polyfill ────────────────────────────────────────────────────
+// ── roundRect polyfill ───────────────────────────────────────────────────────
 if (!CanvasRenderingContext2D.prototype.roundRect) {
-  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
-    this.moveTo(x+r,y);
-    this.lineTo(x+w-r,y);   this.quadraticCurveTo(x+w,y,  x+w,y+r);
-    this.lineTo(x+w,y+h-r); this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-    this.lineTo(x+r,y+h);   this.quadraticCurveTo(x,y+h,  x,y+h-r);
-    this.lineTo(x,y+r);     this.quadraticCurveTo(x,y,    x+r,y);
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+    this.moveTo(x+r, y);
+    this.lineTo(x+w-r, y);   this.quadraticCurveTo(x+w, y,   x+w, y+r);
+    this.lineTo(x+w, y+h-r); this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    this.lineTo(x+r, y+h);   this.quadraticCurveTo(x,   y+h, x,   y+h-r);
+    this.lineTo(x,   y+r);   this.quadraticCurveTo(x,   y,   x+r, y);
     this.closePath(); return this;
   };
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 const lerp  = (a,b,t) => a+(b-a)*t;
 const clamp = (v,lo,hi) => Math.max(lo,Math.min(hi,v));
-const easeOutBack = t => {
-  const c1=1.70158, c3=c1+1;
-  return 1 + c3*Math.pow(t-1,3) + c1*Math.pow(t-1,2);
-};
+const easeOutBack = t => { const c1=1.70158,c3=c1+1; return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2); };
 
-// ── Preload images ────────────────────────────────────────────────────────
+// ── Preload images ────────────────────────────────────────────────────────────
 const IMAGE_FILES = [
   'e686854e-5227.webp',
   '052a032c-de4e787f59e14632b66e31f33997da7e1_all_843.jpg',
@@ -298,334 +247,273 @@ const IMAGE_FILES = [
 ];
 const loadedImgs = new Array(IMAGE_FILES.length).fill(null);
 let imagesReady = false;
-(function preload() {
-  let done=0;
-  IMAGE_FILES.forEach((f,i) => {
-    const img=new Image();
-    img.onload=()=>{ loadedImgs[i]=img; if(++done===IMAGE_FILES.length) imagesReady=true; };
-    img.onerror=()=>{              if(++done===IMAGE_FILES.length) imagesReady=true; };
-    img.src=f;
-  });
-})();
+let doneCount   = 0;
+IMAGE_FILES.forEach((f, i) => {
+  const img = new Image();
+  img.onload  = () => { loadedImgs[i] = img; if (++doneCount === IMAGE_FILES.length) imagesReady = true; };
+  img.onerror = () => {                        if (++doneCount === IMAGE_FILES.length) imagesReady = true; };
+  img.src = f;
+});
 
-// ── Space particle ────────────────────────────────────────────────────────
+// ── Particle ──────────────────────────────────────────────────────────────────
 class Particle {
-  constructor(x,y,vx,vy,r,hue,sat,life) {
-    Object.assign(this,{x,y,vx,vy,r,hue,sat:sat??100,life,maxLife:life});
+  constructor(x,y,vx,vy,r,hue,life) {
+    Object.assign(this,{x,y,vx,vy,r,hue,life,maxLife:life});
   }
-  update() {
-    this.x+=this.vx; this.y+=this.vy;
-    this.vx*=0.965;  this.vy*=0.965;
-    this.life--;
-  }
-  get a() { return this.life/this.maxLife; }
-  draw() {
-    const rr=Math.max(0.1,this.r*this.a);
-    ctx.beginPath(); ctx.arc(this.x,this.y,rr,0,Math.PI*2);
-    ctx.fillStyle=`hsla(${this.hue},${this.sat}%,78%,${this.a})`;
-    ctx.shadowColor=`hsl(${this.hue},100%,65%)`;
-    ctx.shadowBlur=16; ctx.fill();
+  update(){ this.x+=this.vx; this.y+=this.vy; this.vx*=.965; this.vy*=.965; this.life--; }
+  get a(){ return this.life/this.maxLife; }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,Math.max(.1,this.r*this.a),0,Math.PI*2);
+    ctx.fillStyle=`hsla(${this.hue},100%,75%,${this.a})`;
+    ctx.shadowColor=`hsl(${this.hue},100%,65%)`; ctx.shadowBlur=14; ctx.fill();
   }
 }
 const particles=[];
-
-function burst(x,y,n,hueBase,hueRange,spd,r,sat) {
+function burst(x,y,n,hBase,hRange,spd,r){
   for(let i=0;i<n;i++){
-    const a=Math.random()*Math.PI*2, s=spd*(0.3+Math.random()*0.9);
-    particles.push(new Particle(x,y,Math.cos(a)*s,Math.sin(a)*s,
-      r+Math.random()*2.5, hueBase+Math.random()*hueRange, sat??100, 40+Math.random()*50));
+    const a=Math.random()*Math.PI*2, s=spd*(.35+Math.random()*.85);
+    particles.push(new Particle(x,y,Math.cos(a)*s,Math.sin(a)*s,r+Math.random()*2.5,hBase+Math.random()*hRange,45+Math.random()*50));
   }
 }
 
-// ── Star trail (shooting star) ────────────────────────────────────────────
+// ── Shooting star ─────────────────────────────────────────────────────────────
 class ShootingStar {
-  constructor() { this.reset(); }
-  reset() {
-    this.x  = Math.random()*W;
-    this.y  = Math.random()*H*0.5;
-    this.len= 60+Math.random()*120;
-    this.spd= 12+Math.random()*10;
-    this.angle=Math.PI/4+Math.random()*0.4;
-    this.life=1; this.alive=true;
+  constructor(){ this.reset(); }
+  reset(){
+    this.x=Math.random()*W; this.y=Math.random()*H*.5;
+    this.len=65+Math.random()*120; this.spd=12+Math.random()*10;
+    this.ang=Math.PI/4+Math.random()*.4; this.life=1; this.alive=true;
   }
-  update() {
-    this.x+=Math.cos(this.angle)*this.spd;
-    this.y+=Math.sin(this.angle)*this.spd;
-    this.life-=0.03;
+  update(){
+    this.x+=Math.cos(this.ang)*this.spd; this.y+=Math.sin(this.ang)*this.spd;
+    this.life-=.03;
     if(this.life<=0||this.x>W||this.y>H) this.alive=false;
   }
-  draw() {
-    const tx=this.x-Math.cos(this.angle)*this.len;
-    const ty=this.y-Math.sin(this.angle)*this.len;
+  draw(){
+    const tx=this.x-Math.cos(this.ang)*this.len, ty=this.y-Math.sin(this.ang)*this.len;
     const gr=ctx.createLinearGradient(tx,ty,this.x,this.y);
-    gr.addColorStop(0,'transparent');
-    gr.addColorStop(1,`rgba(200,230,255,${this.life*0.9})`);
+    gr.addColorStop(0,'transparent'); gr.addColorStop(1,`rgba(200,230,255,${this.life*.9})`);
     ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(this.x,this.y);
     ctx.strokeStyle=gr; ctx.lineWidth=1.5;
-    ctx.shadowColor='rgba(180,220,255,0.8)'; ctx.shadowBlur=8;
-    ctx.stroke(); ctx.shadowBlur=0;
+    ctx.shadowColor='rgba(180,220,255,.8)'; ctx.shadowBlur=8; ctx.stroke(); ctx.shadowBlur=0;
   }
 }
-const shooters=[];
-let shootTimer=0;
+const shooters=[]; let shootT=0;
 
-// ── Ring orbiting the ball ────────────────────────────────────────────────
+// ── Orbiting planet rings ─────────────────────────────────────────────────────
 class OrbRing {
-  constructor(i,total) {
-    this.angle=(i/total)*Math.PI*2;
-    this.speed=(0.016+Math.random()*0.012)*(i%2?1:-1);
-    this.orbitR=52+Math.random()*24;
-    this.tiltY=0.22+Math.random()*0.4;
+  constructor(i,n){
+    this.ang=(i/n)*Math.PI*2;
+    this.spd=(0.016+Math.random()*.012)*(i%2?1:-1);
+    this.orbitR=50+Math.random()*24;
+    this.tiltY=0.22+Math.random()*.4;
     this.r=1.2+Math.random()*2.2;
     this.hue=180+Math.random()*120;
-    this.alpha=0.45+Math.random()*0.5;
+    this.alp=.45+Math.random()*.5;
   }
-  draw(cx,cy,op) {
-    this.angle+=this.speed;
-    const x=cx+Math.cos(this.angle)*this.orbitR;
-    const y=cy+Math.sin(this.angle)*this.orbitR*this.tiltY;
+  draw(cx,cy,op){
+    this.ang+=this.spd;
+    const x=cx+Math.cos(this.ang)*this.orbitR, y=cy+Math.sin(this.ang)*this.orbitR*this.tiltY;
     ctx.beginPath(); ctx.arc(x,y,this.r,0,Math.PI*2);
-    ctx.fillStyle=`hsla(${this.hue},100%,82%,${this.alpha*op})`;
+    ctx.fillStyle=`hsla(${this.hue},100%,82%,${this.alp*op})`;
     ctx.shadowColor=`hsl(${this.hue},100%,70%)`; ctx.shadowBlur=14; ctx.fill();
   }
 }
 const orbRings=Array.from({length:40},(_,i)=>new OrbRing(i,40));
 
-// ── Ambient cosmic dust ───────────────────────────────────────────────────
-class CosmicDust {
+// ── Cosmic dust ───────────────────────────────────────────────────────────────
+class Dust {
   constructor(){ this.reset(); }
   reset(){
     this.x=Math.random()*W; this.y=Math.random()*H;
-    this.vx=(Math.random()-0.5)*0.25; this.vy=(Math.random()-0.5)*0.12;
-    this.r=Math.random()*1.4+0.2;
-    this.hue=180+Math.random()*120;
+    this.vx=(Math.random()-.5)*.25; this.vy=(Math.random()-.5)*.12;
+    this.r=Math.random()*1.4+.2; this.hue=180+Math.random()*120;
     this.life=150+Math.random()*200; this.maxLife=this.life;
   }
   update(){ this.x+=this.vx; this.y+=this.vy; this.life--; if(this.life<=0) this.reset(); }
   draw(){
-    const a=(this.life/this.maxLife)*0.3;
+    const a=(this.life/this.maxLife)*.28;
     ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
     ctx.fillStyle=`hsla(${this.hue},70%,80%,${a})`; ctx.fill();
   }
 }
-const dust=Array.from({length:300},()=>new CosmicDust());
+const dustArr=Array.from({length:280},()=>new Dust());
 
-// ── Star Ball renderer ────────────────────────────────────────────────────
+// ── Planet / Star ball ────────────────────────────────────────────────────────
 let ballT=0;
-
-function drawStarBall(cx,cy,op) {
-  if(op<0.01) return;
-  ballT+=0.05;
+function drawPlanet(cx,cy,op){
+  if(op<.01) return;
+  ballT+=.05;
   ctx.shadowBlur=0;
-
   const r=56+Math.sin(ballT)*9;
 
-  // Corona rings (space glow)
-  const coronaColors=[
-    [200,80,60,0.08],[220,100,55,0.07],[240,100,50,0.05],[260,100,45,0.04]
-  ];
-  for(let i=0;i<4;i++){
-    const [h,s,l,a]=coronaColors[i];
-    const gr=ctx.createRadialGradient(cx,cy,r*0.5,cx,cy,r*(2.2+i*0.9));
-    gr.addColorStop(0,`hsla(${h},${s}%,${l}%,${a*op})`);
-    gr.addColorStop(1,'transparent');
-    ctx.beginPath(); ctx.arc(cx,cy,r*(2.2+i*0.9),0,Math.PI*2);
-    ctx.fillStyle=gr; ctx.fill();
-  }
+  // Corona glows
+  [[200,80,60,.08],[220,100,55,.07],[245,100,50,.05],[265,100,45,.04]].forEach(([h,s,l,a],i)=>{
+    const gr=ctx.createRadialGradient(cx,cy,r*.5,cx,cy,r*(2.2+i*.9));
+    gr.addColorStop(0,`hsla(${h},${s}%,${l}%,${a*op})`); gr.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(cx,cy,r*(2.2+i*.9),0,Math.PI*2); ctx.fillStyle=gr; ctx.fill();
+  });
 
-  // Saturn-like ring
-  ctx.save();
-  ctx.translate(cx,cy);
-  ctx.scale(1,0.28);
-  const ringGr=ctx.createLinearGradient(-r*2.1,0,r*2.1,0);
-  ringGr.addColorStop(0,'transparent');
-  ringGr.addColorStop(0.18,`hsla(210,80%,70%,${op*0.5})`);
-  ringGr.addColorStop(0.42,`hsla(230,90%,80%,${op*0.7})`);
-  ringGr.addColorStop(0.5,'transparent'); // gap where planet is
-  ringGr.addColorStop(0.58,`hsla(230,90%,80%,${op*0.7})`);
-  ringGr.addColorStop(0.82,`hsla(210,80%,70%,${op*0.5})`);
-  ringGr.addColorStop(1,'transparent');
+  // Saturn ring
+  ctx.save(); ctx.translate(cx,cy); ctx.scale(1,.28);
+  const rg=ctx.createLinearGradient(-r*2.1,0,r*2.1,0);
+  rg.addColorStop(0,'transparent');
+  rg.addColorStop(.18,`hsla(210,80%,70%,${op*.5})`);
+  rg.addColorStop(.42,`hsla(230,90%,80%,${op*.7})`);
+  rg.addColorStop(.5,'transparent');
+  rg.addColorStop(.58,`hsla(230,90%,80%,${op*.7})`);
+  rg.addColorStop(.82,`hsla(210,80%,70%,${op*.5})`);
+  rg.addColorStop(1,'transparent');
   ctx.beginPath(); ctx.ellipse(0,0,r*2.1,r*2.1,0,0,Math.PI*2);
-  ctx.lineWidth=18*op;
-  ctx.strokeStyle=ringGr;
-  ctx.shadowColor=`hsla(220,100%,70%,${op})`; ctx.shadowBlur=20;
-  ctx.stroke();
+  ctx.lineWidth=18*op; ctx.strokeStyle=rg;
+  ctx.shadowColor=`hsla(220,100%,70%,${op})`; ctx.shadowBlur=20; ctx.stroke();
   ctx.restore();
 
-  // Main planet sphere
+  // Main sphere
   const gr=ctx.createRadialGradient(cx-r*.28,cy-r*.3,0,cx,cy,r);
-  gr.addColorStop(0,   `rgba(240,250,255,${op})`);
-  gr.addColorStop(0.18,`hsla(210,80%,88%,${op})`);
-  gr.addColorStop(0.45,`hsla(220,100%,60%,${op})`);
-  gr.addColorStop(0.75,`hsla(240,100%,35%,${op})`);
-  gr.addColorStop(1,   `hsla(260,100%,15%,${op})`);
+  gr.addColorStop(0,`rgba(240,250,255,${op})`);
+  gr.addColorStop(.18,`hsla(210,80%,88%,${op})`);
+  gr.addColorStop(.45,`hsla(220,100%,60%,${op})`);
+  gr.addColorStop(.75,`hsla(240,100%,35%,${op})`);
+  gr.addColorStop(1,  `hsla(260,100%,15%,${op})`);
   ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-  ctx.fillStyle=gr;
-  ctx.shadowColor=`hsla(220,100%,70%,${op})`; ctx.shadowBlur=55;
+  ctx.fillStyle=gr; ctx.shadowColor=`hsla(220,100%,70%,${op})`; ctx.shadowBlur=55;
   ctx.fill(); ctx.shadowBlur=0;
 
-  // Surface swirl (atmosphere bands)
+  // Atmosphere bands
   for(let i=0;i<3;i++){
-    const by2=cy + (i-1)*r*0.3 + Math.sin(ballT*0.4+i)*r*0.08;
-    const bandGr=ctx.createLinearGradient(cx-r,by2,cx+r,by2);
-    bandGr.addColorStop(0,'transparent');
-    bandGr.addColorStop(0.3,`hsla(${190+i*20},80%,75%,${op*0.12})`);
-    bandGr.addColorStop(0.7,`hsla(${210+i*20},80%,70%,${op*0.08})`);
-    bandGr.addColorStop(1,'transparent');
+    const by=cy+(i-1)*r*.3+Math.sin(ballT*.4+i)*r*.08;
+    const bg=ctx.createLinearGradient(cx-r,by,cx+r,by);
+    bg.addColorStop(0,'transparent');
+    bg.addColorStop(.3,`hsla(${190+i*20},80%,75%,${op*.12})`);
+    bg.addColorStop(.7,`hsla(${210+i*20},80%,70%,${op*.08})`);
+    bg.addColorStop(1,'transparent');
     ctx.save();
-    ctx.beginPath(); ctx.ellipse(cx,cy,r,r,0,0,Math.PI*2);
-    ctx.clip();
-    ctx.fillStyle=bandGr;
-    ctx.fillRect(cx-r,by2-r*0.2,r*2,r*0.4);
+    ctx.beginPath(); ctx.ellipse(cx,cy,r,r,0,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle=bg; ctx.fillRect(cx-r,by-r*.2,r*2,r*.4);
     ctx.restore();
   }
 
   // Glint
   const g2=ctx.createRadialGradient(cx-r*.3,cy-r*.32,0,cx-r*.12,cy-r*.18,r*.45);
-  g2.addColorStop(0,`rgba(255,255,255,${op*.75})`);
-  g2.addColorStop(1,'transparent');
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
-  ctx.fillStyle=g2; ctx.fill();
+  g2.addColorStop(0,`rgba(255,255,255,${op*.75})`); g2.addColorStop(1,'transparent');
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=g2; ctx.fill();
 
-  // Orbiting particles
   for(const rb of orbRings) rb.draw(cx,cy,op);
   ctx.shadowBlur=0;
 }
 
-// ── Photo Card (satellite style) ─────────────────────────────────────────
+// ── Photo cards ───────────────────────────────────────────────────────────────
 class PhotoCard {
-  constructor(img,i,total){
-    this.img=img; this.total=total;
-    this.angle=(i/total)*Math.PI*2 - Math.PI/2;
-    this.orbitR=Math.min(W,H)*0.35;
-    this.w=Math.min(W,H)*0.18;
-    this.h=this.w*0.72;
-    this.tilt=(Math.random()-0.5)*0.2;
+  constructor(img,i,n){
+    this.img=img;
+    this.ang=(i/n)*Math.PI*2-Math.PI*.5;
+    this.orbitR=Math.min(W,H)*.35;
+    this.w=Math.min(W,H)*.18; this.h=this.w*.72;
+    this.tilt=(Math.random()-.5)*.2;
     this.floatPh=Math.random()*Math.PI*2;
-    this.glowHue=180+i*(200/total);
-    this.delay=i*0.055;
-    // Subtle drift orbit
-    this.driftAmp=4+Math.random()*6;
-    this.driftPh=Math.random()*Math.PI*2;
+    this.glowH=180+i*(200/n);
+    this.delay=i*.055;
+    this.driftA=4+Math.random()*6;
   }
-  draw(cx,cy,progress,t){
+  draw(cx,cy,prog,t){
     if(!this.img) return;
-    const stagger=clamp(progress*1.9-this.delay,0,1);
-    if(stagger<=0.001) return;
-    const ease=easeOutBack(clamp(stagger,0,1));
-    const alpha=clamp(stagger*2,0,1);
-
-    const tx=cx+Math.cos(this.angle)*this.orbitR;
-    const ty=cy+Math.sin(this.angle)*this.orbitR
-              +Math.sin(t*0.65+this.floatPh)*this.driftAmp*ease;
-    const x=lerp(cx,tx,ease);
-    const y=lerp(cy,ty,ease);
-    const w=this.w*ease;
-    const h=this.h*ease;
-    const rx=12*ease;
+    const sg=clamp(prog*1.9-this.delay,0,1);
+    if(sg<=.001) return;
+    const ease=easeOutBack(clamp(sg,0,1));
+    const alpha=clamp(sg*2,0,1);
+    const tx=cx+Math.cos(this.ang)*this.orbitR;
+    const ty=cy+Math.sin(this.ang)*this.orbitR+Math.sin(t*.65+this.floatPh)*this.driftA*ease;
+    const x=lerp(cx,tx,ease), y=lerp(cy,ty,ease);
+    const w=this.w*ease, h=this.h*ease, rx=12*ease;
 
     ctx.save();
     ctx.globalAlpha=alpha;
-    ctx.translate(x,y);
-    ctx.rotate(this.tilt);
+    ctx.translate(x,y); ctx.rotate(this.tilt);
 
-    // Space shadow
-    ctx.shadowColor='rgba(0,5,30,0.7)';
+    // Shadow
+    ctx.shadowColor='rgba(0,5,30,.7)';
     ctx.shadowBlur=28; ctx.shadowOffsetX=5; ctx.shadowOffsetY=10;
 
-    // Image with rounded corners
+    // Clip+draw
     ctx.save();
-    ctx.beginPath(); ctx.roundRect(-w/2,-h/2,w,h,rx);
-    ctx.clip();
+    ctx.beginPath(); ctx.roundRect(-w/2,-h/2,w,h,rx); ctx.clip();
     ctx.drawImage(this.img,-w/2,-h/2,w,h);
     ctx.restore();
 
-    // Cosmic glow border
-    ctx.shadowColor=`hsl(${this.glowHue},100%,65%)`;
+    // Glow border
+    ctx.shadowColor=`hsl(${this.glowH},100%,65%)`;
     ctx.shadowBlur=24; ctx.shadowOffsetX=0; ctx.shadowOffsetY=0;
-    ctx.strokeStyle=`hsla(${this.glowHue},100%,78%,0.8)`;
+    ctx.strokeStyle=`hsla(${this.glowH},100%,78%,.8)`;
     ctx.lineWidth=2;
     ctx.beginPath(); ctx.roundRect(-w/2,-h/2,w,h,rx); ctx.stroke();
 
-    // Corner star sparkles
-    if(ease>0.7){
-      const corners=[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]];
-      ctx.fillStyle=`hsla(${this.glowHue},100%,95%,${(ease-0.7)*3*0.7})`;
-      ctx.shadowColor=`hsl(${this.glowHue},100%,80%)`; ctx.shadowBlur=8;
-      for(const [cx2,cy2] of corners){
-        const sparkR=3+Math.sin(t*2+this.floatPh)*1.5;
-        ctx.beginPath(); ctx.arc(cx2,cy2,Math.max(0.1,sparkR),0,Math.PI*2); ctx.fill();
-      }
+    // Corner sparkles (fully expanded)
+    if(ease>.7){
+      const alp=(ease-.7)*3*.7;
+      ctx.fillStyle=`hsla(${this.glowH},100%,95%,${alp})`;
+      ctx.shadowColor=`hsl(${this.glowH},100%,80%)`; ctx.shadowBlur=8;
+      [[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]].forEach(([ex,ey])=>{
+        const sr=Math.max(.1,2.5+Math.sin(t*2+this.floatPh)*1.2);
+        ctx.beginPath(); ctx.arc(ex,ey,sr,0,Math.PI*2); ctx.fill();
+      });
     }
     ctx.restore();
   }
 }
 let photoCards=[];
 
-// ── Hand skeleton ─────────────────────────────────────────────────────────
-const CONNECTIONS=[
-  [0,1],[1,2],[2,3],[3,4],
-  [0,5],[5,6],[6,7],[7,8],
-  [0,9],[9,10],[10,11],[11,12],
-  [0,13],[13,14],[14,15],[15,16],
-  [0,17],[17,18],[18,19],[19,20],
-  [5,9],[9,13],[13,17]
-];
+// ── Hand skeleton ─────────────────────────────────────────────────────────────
+const CONN=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[0,9],[9,10],[10,11],[11,12],
+            [0,13],[13,14],[14,15],[15,16],[0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]];
 function drawSkeleton(lm,alpha){
   const mx=p=>(1-p.x)*W, my=p=>p.y*H;
-  ctx.save();
-  ctx.globalAlpha=alpha;
-  ctx.strokeStyle='rgba(120,180,255,0.65)';
-  ctx.lineWidth=1.6;
+  ctx.save(); ctx.globalAlpha=alpha;
+  ctx.strokeStyle='rgba(120,185,255,.65)'; ctx.lineWidth=1.6;
   ctx.shadowColor='#44aaff'; ctx.shadowBlur=12;
-  for(const [a,b] of CONNECTIONS){
-    ctx.beginPath();
-    ctx.moveTo(mx(lm[a]),my(lm[a]));
-    ctx.lineTo(mx(lm[b]),my(lm[b]));
-    ctx.stroke();
+  for(const [a,b] of CONN){
+    ctx.beginPath(); ctx.moveTo(mx(lm[a]),my(lm[a])); ctx.lineTo(mx(lm[b]),my(lm[b])); ctx.stroke();
   }
   for(let i=0;i<lm.length;i++){
-    ctx.beginPath();
-    ctx.arc(mx(lm[i]),my(lm[i]),i===0?5.5:3,0,Math.PI*2);
-    ctx.fillStyle=[4,8,12,16,20].includes(i)?'#ffffff':'rgba(140,200,255,0.9)';
+    ctx.beginPath(); ctx.arc(mx(lm[i]),my(lm[i]),i===0?5.5:3,0,Math.PI*2);
+    ctx.fillStyle=[4,8,12,16,20].includes(i)?'#fff':'rgba(140,200,255,.9)';
     ctx.shadowBlur=16; ctx.fill();
   }
   ctx.restore();
 }
 
-// ── Gesture ───────────────────────────────────────────────────────────────
+// ── Gesture: openness 0=closed, 1=open ───────────────────────────────────────
 function getOpenness(lm){
   const pcx=(lm[0].x+lm[5].x+lm[9].x+lm[13].x+lm[17].x)/5;
   const pcy=(lm[0].y+lm[5].y+lm[9].y+lm[13].y+lm[17].y)/5;
   const ref=Math.hypot(lm[0].x-lm[9].x,lm[0].y-lm[9].y);
-  if(ref<0.01) return 0;
+  if(ref<.01) return 0;
   let d=0;
   for(const t of [4,8,12,16,20]) d+=Math.hypot(lm[t].x-pcx,lm[t].y-pcy);
-  return clamp((d/5/ref-0.45)/0.95,0,1);
+  return clamp((d/5/ref-.45)/.95,0,1);
 }
 
-// ── State ─────────────────────────────────────────────────────────────────
+// ── State ─────────────────────────────────────────────────────────────────────
 let curLm=null, handSeen=false;
 let palmX=null, palmY=null;
 let smoothOpen=0, prevSmooth=0;
 let appTime=0, frame=0, lastHandTs=0;
+let handDetector=null, lastVidTime=-1;
 
-// ── Main loop ─────────────────────────────────────────────────────────────
-function loop(){
-  frame++; appTime+=0.016;
+// ── Render loop ───────────────────────────────────────────────────────────────
+function renderLoop(){
+  frame++; appTime+=.016;
   ctx.shadowBlur=0;
 
-  // Space background fade
-  ctx.fillStyle='rgba(0,0,8,0.14)';
-  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(0,0,8,.15)'; ctx.fillRect(0,0,W,H);
 
   // Cosmic dust
   ctx.shadowBlur=0;
-  for(const d of dust){ d.update(); d.draw(); }
+  for(const d of dustArr){ d.update(); d.draw(); }
 
   // Shooting stars
-  shootTimer++;
-  if(shootTimer>220+Math.random()*300){ shootTimer=0; shooters.push(new ShootingStar()); }
+  if(++shootT>220+Math.random()*300){ shootT=0; shooters.push(new ShootingStar()); }
   for(let i=shooters.length-1;i>=0;i--){
     shooters[i].update(); shooters[i].draw();
     if(!shooters[i].alive) shooters.splice(i,1);
@@ -640,107 +528,120 @@ function loop(){
   ctx.shadowBlur=0;
 
   // Ball / palm position
-  let bx,by;
+  let bx, by;
   if(handSeen&&curLm){
     const lm=curLm;
-    const pcxn=(lm[0].x+lm[5].x+lm[9].x+lm[13].x+lm[17].x)/5;
-    const pcyn=(lm[0].y+lm[5].y+lm[9].y+lm[13].y+lm[17].y)/5;
-    const tx=(1-pcxn)*W, ty=pcyn*H;
-    palmX=palmX===null?tx:lerp(palmX,tx,0.22);
-    palmY=palmY===null?ty:lerp(palmY,ty,0.22);
+    const pn=(lm[0].x+lm[5].x+lm[9].x+lm[13].x+lm[17].x)/5;
+    const pm=(lm[0].y+lm[5].y+lm[9].y+lm[13].y+lm[17].y)/5;
+    const tx=(1-pn)*W, ty=pm*H;
+    palmX=palmX===null?tx:lerp(palmX,tx,.22);
+    palmY=palmY===null?ty:lerp(palmY,ty,.22);
     bx=palmX; by=palmY;
-    smoothOpen=lerp(smoothOpen,getOpenness(lm),0.10);
+    smoothOpen=lerp(smoothOpen,getOpenness(lm),.10);
   } else {
-    const dr=appTime*0.35;
-    bx=W/2+Math.sin(dr)*22; by=H/2+Math.cos(dr*0.62)*14;
-    smoothOpen=lerp(smoothOpen,0,0.04);
+    const dr=appTime*.35;
+    bx=W/2+Math.sin(dr)*22; by=H/2+Math.cos(dr*.62)*14;
+    smoothOpen=lerp(smoothOpen,0,.04);
   }
 
-  // Transitions
-  if(smoothOpen>0.68&&prevSmooth<=0.68){
-    // Big Bang!
-    burst(bx,by,60,42,40,10,3.5,100);   // gold
-    burst(bx,by,30,200,60,7,2.5,90);     // blue
-    burst(bx,by,20,0,360,12,2,80);       // rainbow
+  // Transition effects
+  if(smoothOpen>.68&&prevSmooth<=.68){
+    burst(bx,by,60,42,40,10,3.5);  // Big Bang golden
+    burst(bx,by,30,200,60,7,2.5);  // blue
+    burst(bx,by,18,0,360,12,2);    // rainbow
   }
-  if(smoothOpen<0.28&&prevSmooth>=0.28){
-    burst(bx,by,32,210,50,6,2.5,100);    // blue collapse
-  }
+  if(smoothOpen<.28&&prevSmooth>=.28) burst(bx,by,30,210,50,6,2.5);
   prevSmooth=smoothOpen;
 
-  // Inward particles (hand closing / closed)
-  if(smoothOpen<0.4&&frame%2===0&&handSeen){
-    const a=Math.random()*Math.PI*2;
-    const d=90+Math.random()*70;
-    particles.push(new Particle(
-      bx+Math.cos(a)*d, by+Math.sin(a)*d,
-      -Math.cos(a)*3.5, -Math.sin(a)*3.5,
-      1.5+Math.random()*1.5, 200+Math.random()*60, 100, 30
-    ));
+  // Inward suction (closed)
+  if(smoothOpen<.4&&frame%2===0&&handSeen){
+    const a=Math.random()*Math.PI*2, dd=90+Math.random()*70;
+    particles.push(new Particle(bx+Math.cos(a)*dd,by+Math.sin(a)*dd,-Math.cos(a)*3.5,-Math.sin(a)*3.5,1.5+Math.random()*1.5,200+Math.random()*60,30));
+  }
+  // Outward shimmer (open)
+  if(smoothOpen>.62&&frame%3===0&&handSeen){
+    const a=Math.random()*Math.PI*2, s=2.5+Math.random()*4;
+    particles.push(new Particle(bx,by,Math.cos(a)*s,Math.sin(a)*s,2+Math.random()*2.5,40+Math.random()*30,55));
   }
 
-  // Outward cosmic shimmer (hand open)
-  if(smoothOpen>0.62&&frame%3===0&&handSeen){
-    const a=Math.random()*Math.PI*2;
-    const s=2.5+Math.random()*4;
-    particles.push(new Particle(bx,by,
-      Math.cos(a)*s,Math.sin(a)*s,
-      2+Math.random()*2.5, 40+Math.random()*30, 100, 55
-    ));
-  }
-
-  // Draw star-planet (closed)
+  // Draw planet (closed)
   const ballOp=clamp(Math.pow(1-smoothOpen*1.4,1.7),0,1);
-  drawStarBall(bx,by,ballOp);
+  drawPlanet(bx,by,ballOp);
 
   // Draw photo cards (open)
-  const photoP=clamp((smoothOpen-0.18)/0.55,0,1);
+  const photoP=clamp((smoothOpen-.18)/.55,0,1);
   for(const c of photoCards) c.draw(bx,by,photoP,appTime);
 
-  // Hand skeleton
-  if(handSeen&&curLm) drawSkeleton(curLm,0.35+smoothOpen*0.5);
-
+  if(handSeen&&curLm) drawSkeleton(curLm,.35+smoothOpen*.5);
   ctx.shadowBlur=0;
-  requestAnimationFrame(loop);
+  requestAnimationFrame(renderLoop);
 }
 
-// ── MediaPipe ─────────────────────────────────────────────────────────────
-async function startApp(){
-  overlay.classList.add('hidden');
-  statusEl.textContent='⏳ Đang tải mô hình vũ trụ...';
-
-  const handsDetector=new Hands({
-    locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
-  });
-  handsDetector.setOptions({
-    maxNumHands:1, modelComplexity:1,
-    minDetectionConfidence:0.72, minTrackingConfidence:0.62
-  });
-
-  handsDetector.onResults(res=>{
-    if(res.multiHandLandmarks?.length){
-      curLm=res.multiHandLandmarks[0];
-      handSeen=true; lastHandTs=Date.now();
-      const o=getOpenness(curLm);
-      statusEl.textContent = o>0.65
-        ? '🌌 Vũ trụ bùng nổ — Ảnh nở ra ✨'
-        : o<0.28
-          ? '⭐ Ngôi sao hội tụ — Hành tinh ra đời 🪐'
-          : '🤚 Đang nhận diện cử chỉ...';
-    } else {
-      if(Date.now()-lastHandTs>900){ handSeen=false; curLm=null; }
-      statusEl.textContent='👋 Đưa tay vào vũ trụ';
+// ── Hand detection loop (uses tasks-vision detectForVideo) ────────────────────
+function detectLoop(){
+  if(handDetector&&video.readyState>=2){
+    const nowMs=performance.now();
+    if(video.currentTime!==lastVidTime){
+      lastVidTime=video.currentTime;
+      try{
+        const res=handDetector.detectForVideo(video,nowMs);
+        if(res.landmarks&&res.landmarks.length>0){
+          curLm=res.landmarks[0];
+          handSeen=true; lastHandTs=Date.now();
+          const o=getOpenness(curLm);
+          statusEl.textContent=o>.65?'🌌 Vũ trụ bùng nổ — Ảnh nở ra ✨':o<.28?'⭐ Ngôi sao hội tụ 🪐':'🤚 Nhận diện cử chỉ...';
+        } else {
+          if(Date.now()-lastHandTs>800){ handSeen=false; curLm=null; }
+          statusEl.textContent='👋 Đưa tay vào vũ trụ';
+        }
+      } catch(e){ /* skip bad frame */ }
     }
-  });
+  }
+  requestAnimationFrame(detectLoop);
+}
 
-  const camera=new Camera(video,{
-    onFrame:async()=>{ await handsDetector.send({image:video}); },
-    width:1280,height:720
-  });
+// ── Start app ─────────────────────────────────────────────────────────────────
+startBtn.addEventListener('click', async () => {
+  startBtn.disabled=true;
+  startBtn.textContent='⏳ Đang tải AI...';
+
+  // 1. Check library loaded
+  if(typeof FilesetResolver==='undefined'||typeof HandLandmarker==='undefined'){
+    statusEl.textContent='❌ Thư viện AI chưa tải. Kiểm tra mạng & tải lại trang.';
+    startBtn.disabled=false; startBtn.textContent='🔄 Tải lại';
+    startBtn.addEventListener('click',()=>location.reload(),{once:true});
+    return;
+  }
 
   try{
-    await camera.start();
+    // 2. Init hand detector
+    const vision=await FilesetResolver.forVisionTasks(
+      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+    );
+    handDetector=await HandLandmarker.createFromOptions(vision,{
+      baseOptions:{
+        modelAssetPath:'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+        delegate:'GPU'
+      },
+      runningMode:'VIDEO',
+      numHands:1
+    });
+
+    startBtn.textContent='📷 Đang mở camera...';
+
+    // 3. Camera
+    const stream=await navigator.mediaDevices.getUserMedia({
+      video:{ width:1280, height:720, facingMode:'user' },
+      audio:false
+    });
+    video.srcObject=stream;
+    await video.play();
+
+    // 4. Hide overlay, start loops
+    overlay.classList.add('hidden');
     statusEl.textContent='👋 Đưa tay vào vũ trụ';
+
+    // 5. Load photo cards
     const iv=setInterval(()=>{
       if(imagesReady){
         clearInterval(iv);
@@ -748,14 +649,23 @@ async function startApp(){
         photoCards=imgs.map((img,i)=>new PhotoCard(img,i,imgs.length));
       }
     },200);
-  }catch(e){
-    statusEl.textContent='❌ Lỗi camera: '+e.message;
+
+    detectLoop();
+
+  } catch(e){
+    console.error(e);
+    let msg='❌ Lỗi: '+e.message;
+    if(e.name==='NotAllowedError') msg='❌ Bạn cần cấp quyền camera để dùng ứng dụng';
+    if(e.name==='NotFoundError')   msg='❌ Không tìm thấy camera trên thiết bị này';
+    statusEl.textContent=msg;
+    startBtn.disabled=false;
+    startBtn.textContent='🚀 Thử lại';
     overlay.classList.remove('hidden');
   }
-}
+});
 
-startBtn.addEventListener('click',startApp);
-loop();
+// Start visual render loop right away (shows ambient universe)
+renderLoop();
 </script>
 </body>
 </html>
