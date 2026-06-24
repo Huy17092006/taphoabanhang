@@ -273,16 +273,21 @@ function analyzeHand(lm) {
   const palm = { x: lm[9].x, y: lm[9].y };
   let state = 'float';
   if (count >= 4) state = 'open';
-  else if (count === 1 && idx) state = 'oneFinger';
+  else if (count === 1) state = 'oneFinger';   // 1 ngón tay BẤT KỲ → xếp hàng ngang
   else if (count >= 2) state = 'open';
-  return { count, pinch, palm, state, idxOnly: (count===1 && idx) };
+  return { count, pinch, palm, state, oneFinger: (count === 1) };
 }
 
 // ───────────────────────── Vòng lặp vẽ ─────────────────────────
 let lastHintState = '';
+let hintTimer = null;
 function setHint(txt) {
-  if (txt) { hintEl.textContent = txt; hintEl.style.opacity = '1'; }
-  else hintEl.style.opacity = '0';
+  clearTimeout(hintTimer);
+  if (txt) {
+    hintEl.textContent = txt; hintEl.style.opacity = '1';
+    // tự ẩn gợi ý để màn hình gọn, không che hiệu ứng
+    hintTimer = setTimeout(() => { hintEl.style.opacity = '0'; }, 2200);
+  } else hintEl.style.opacity = '0';
 }
 
 function render(t) {
@@ -489,12 +494,54 @@ async function detectLoop() {
   requestAnimationFrame(detectLoop);
 }
 
+// ───────────────────────── Ảnh giữ chỗ (tạo bằng canvas) ─────────────────────────
+// Khi không có ảnh mặc định, tạo các tấm ảnh gradient nhiều màu để hiệu ứng
+// luôn có nội dung hiển thị. Cùng tông sáng & nét với ảnh thật và camera.
+function makePlaceholder(i, total) {
+  const c = document.createElement('canvas');
+  c.width = 360; c.height = 480;
+  const g = c.getContext('2d');
+  const hue = (i / Math.max(total, 1)) * 360;
+  const grad = g.createLinearGradient(0, 0, c.width, c.height);
+  grad.addColorStop(0, `hsl(${hue}, 85%, 62%)`);
+  grad.addColorStop(1, `hsl(${(hue + 60) % 360}, 80%, 42%)`);
+  g.fillStyle = grad; g.fillRect(0, 0, c.width, c.height);
+  // chấm sáng trang trí
+  for (let k = 0; k < 26; k++) {
+    g.beginPath();
+    g.arc(Math.random() * c.width, Math.random() * c.height, Math.random() * 26 + 4, 0, Math.PI * 2);
+    g.fillStyle = `hsla(${(hue + Math.random() * 120) % 360}, 90%, 80%, 0.22)`;
+    g.fill();
+  }
+  g.fillStyle = 'rgba(255,255,255,0.92)';
+  g.font = 'bold 120px Segoe UI, sans-serif';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('✦', c.width / 2, c.height / 2);
+  const img = new Image();
+  img.naturalSrc = c.toDataURL('image/png');
+  img.src = img.naturalSrc;
+  return img;
+}
+function loadPlaceholders(count = 10) {
+  for (let i = 0; i < count; i++) {
+    const img = makePlaceholder(i, count);
+    if (img.complete) cards.push(new PhotoCard(img, cards.length));
+    else img.onload = () => cards.push(new PhotoCard(img, cards.length));
+  }
+}
+
 // ───────────────────────── Tải ảnh mặc định ─────────────────────────
+let defaultTried = 0, defaultLoaded = 0;
 function loadDefaultImages() {
+  if (!DEFAULT_IMAGES.length) { loadPlaceholders(); return; }
   DEFAULT_IMAGES.forEach((src, i) => {
     const img = new Image();
-    img.onload = () => cards.push(new PhotoCard(img, i));
-    img.onerror = () => {};
+    img.onload = () => { defaultLoaded++; defaultTried++; cards.push(new PhotoCard(img, i)); };
+    img.onerror = () => {
+      defaultTried++;
+      // Khi đã thử hết mà không tải được ảnh nào → dùng ảnh giữ chỗ
+      if (defaultTried === DEFAULT_IMAGES.length && defaultLoaded === 0) loadPlaceholders();
+    };
     img.src = src;
   });
 }
